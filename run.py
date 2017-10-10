@@ -3,8 +3,9 @@ from network import ShallowNet
 from keras.datasets import cifar10
 from keras.datasets import mnist
 from utils import conf_matrix
+import optimizers
 
-nonliniarity = "sigmoid"
+nonliniarity = "tanh"
 dataset = "cifar"
 nb_hidden_units = 500
 
@@ -31,6 +32,7 @@ learning_rate = 1e-3
 lr_decay = 1
 summary_interval = 100
 # checkpoint_interval = 1
+optimizer = optimizers.AdamOptimizer(learning_rate)
 
 y_train = y_train.reshape(y_train.shape[0])
 y_test = y_test.reshape(y_test.shape[0])
@@ -54,8 +56,9 @@ for t in range(num_iterations):
   loss, grads = model.loss(X_batch, y_batch)
 
   new_params = model.get_params()
-  for var, grad in zip(new_params, grads):
-    var -= learning_rate * grad
+  new_params = optimizer.update_params(zip(new_params, grads))
+  # for var, grad in zip(new_params, grads):
+  #   var -= learning_rate * grad
   model.set_params(new_params)
 
   if (t + 1) % iter_per_epoch == 0:
