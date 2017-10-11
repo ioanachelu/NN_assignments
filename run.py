@@ -4,10 +4,12 @@ from keras.datasets import cifar10
 from keras.datasets import mnist
 from utils import conf_matrix
 import optimizers
+import matplotlib.pyplot as plt
 
 nonliniarity = "tanh"
-dataset = "cifar"
+dataset = "mnist"
 nb_hidden_units = 500
+losses = []
 
 if dataset == "cifar":
   (X_train, y_train), (X_test, y_test) = cifar10.load_data()
@@ -32,7 +34,7 @@ learning_rate = 1e-3
 lr_decay = 1
 summary_interval = 100
 # checkpoint_interval = 1
-optimizer = optimizers.MomentumOptimizer(learning_rate)
+optimizer = optimizers.AdamOptimizer(learning_rate)
 
 y_train = y_train.reshape(y_train.shape[0])
 y_test = y_test.reshape(y_test.shape[0])
@@ -72,6 +74,7 @@ for t in range(num_iterations):
     print("Epoch {} >>>  \n Iter {} / {} >>> lr: {} >>> Loss: {} >>> train_acc: {} >>> val_acc: {}".format(epoch, t + 1, num_iterations,
                                                                                                    learning_rate, loss,
                                                                                                    train_acc, val_acc))
+    losses.append(val_acc)
     if val_acc > best_val_acc:
       best_val_acc = val_acc
       best_params = []
@@ -80,5 +83,7 @@ for t in range(num_iterations):
 
 model.set_params(best_params)
 np.save('_'.join(["model", nonliniarity, str(dataset), str(nb_hidden_units)]), model.params)
+plt.plot(losses)
+plt.savefig('_'.join(["model", nonliniarity, str(dataset), str(nb_hidden_units)]) + "_adam.png")
 
 
