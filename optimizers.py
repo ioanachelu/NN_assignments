@@ -4,9 +4,9 @@ class GradientDescentOptimizer():
   def __init__(self, lr=0.1):
     self.lr = lr
 
-  def update_params(self, vars_and_grads):
+  def update_params(self, vars, grads):
     new_vars = []
-    for var, grad in vars_and_grads:
+    for var, grad in zip(vars, grads):
       new_var = var - self.lr * grad
       new_vars.append(new_var)
     return new_vars
@@ -17,14 +17,14 @@ class MomentumOptimizer(GradientDescentOptimizer):
     self.momentum = momentum
     self.first_moment = None
 
-  def update_params(self, vars_and_grads):
+  def update_params(self, vars, grads):
     new_vars = []
     if self.first_moment is None:
       self.first_moment = []
-      for var, grad in enumerate(vars_and_grads):
+      for var, grad in zip(vars, grads):
         self.first_moment.append(np.zeros_like(var))
 
-    for i, var, grad in enumerate(vars_and_grads):
+    for i, (var, grad) in enumerate(zip(vars, grads)):
       new_v = self.momentum * self.first_moment[i] - self.lr * grad
       new_var = var + new_v
       new_vars.append(new_var)
@@ -39,17 +39,17 @@ class RMSPropOptimizer(MomentumOptimizer):
     self.epsilon = epsilon
     self.second_moment = None
 
-  def update_params(self, vars_and_grads):
+  def update_params(self, vars, grads):
     new_vars = []
     if self.second_moment is None:
       self.second_moment = []
-      for var, grad in enumerate(vars_and_grads):
+      for var, grad in zip(vars, grads):
         self.second_moment.append(np.zeros_like(var))
 
-    for i, var, grad in enumerate(vars_and_grads):
+    for i, (var, grad) in enumerate(zip(vars, grads)):
       self.second_moment[i] = self.second_moment[i] * self.decay + \
                               (1 - self.decay) * (grad ** 2)
-      new_var = var - self.lr * grad / np.sqrt(self.second_moment + self.epsilon)
+      new_var = var - self.lr * grad / np.sqrt(self.second_moment[i] + self.epsilon)
       new_vars.append(new_var)
 
     return new_vars
@@ -64,20 +64,20 @@ class AdamOptimizer(GradientDescentOptimizer):
     self.first_moment = None
     self.t = 0
 
-  def update_params(self, vars_and_grads):
+  def update_params(self, vars, grads):
     if self.second_moment is None:
       self.second_moment = []
-      for var, grad in enumerate(vars_and_grads):
+      for var, grad in zip(vars, grads):
         self.second_moment.append(np.zeros_like(var))
 
     if self.first_moment is None:
       self.first_moment = []
-      for var, grad in enumerate(vars_and_grads):
+      for var, grad in zip(vars, grads):
         self.first_moment.append(np.zeros_like(var))
 
     self.t += 1
     new_vars = []
-    for i, var, grad in enumerate(vars_and_grads):
+    for i, (var, grad) in enumerate(zip(vars, grads)):
       self.first_moment[i] = self.beta1 * self.first_moment[i] + (1 - self.beta1) * grad
       self.second_moment[i] = self.beta2 * self.second_moment[i] + (1 - self.beta2) * (grad ** 2)
       f_m_hat = self.first_moment[i] / (1 - self.beta1 ** self.t)

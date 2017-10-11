@@ -32,7 +32,7 @@ learning_rate = 1e-3
 lr_decay = 1
 summary_interval = 100
 # checkpoint_interval = 1
-optimizer = optimizers.AdamOptimizer(learning_rate)
+optimizer = optimizers.MomentumOptimizer(learning_rate)
 
 y_train = y_train.reshape(y_train.shape[0])
 y_test = y_test.reshape(y_test.shape[0])
@@ -56,7 +56,7 @@ for t in range(num_iterations):
   loss, grads = model.loss(X_batch, y_batch)
 
   new_params = model.get_params()
-  new_params = optimizer.update_params(zip(new_params, grads))
+  new_params = optimizer.update_params(new_params, grads)
   # for var, grad in zip(new_params, grads):
   #   var -= learning_rate * grad
   model.set_params(new_params)
