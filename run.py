@@ -7,7 +7,7 @@ import optimizers
 import matplotlib.pyplot as plt
 
 nonliniarity = "tanh"
-dataset = "mnist"
+dataset = "cifar"
 nb_hidden_units = 500
 losses = []
 
@@ -34,7 +34,7 @@ learning_rate = 1e-3
 lr_decay = 1
 summary_interval = 100
 # checkpoint_interval = 1
-optimizer = optimizers.AdamOptimizer(learning_rate)
+optimizer = optimizers.MomentumOptimizer(learning_rate)
 
 y_train = y_train.reshape(y_train.shape[0])
 y_test = y_test.reshape(y_test.shape[0])
@@ -84,6 +84,6 @@ for t in range(num_iterations):
 model.set_params(best_params)
 np.save('_'.join(["model", nonliniarity, str(dataset), str(nb_hidden_units)]), model.params)
 plt.plot(losses)
-plt.savefig('_'.join(["model", nonliniarity, str(dataset), str(nb_hidden_units)]) + "_adam.png")
+plt.savefig('_'.join(["model", nonliniarity, str(dataset), str(nb_hidden_units)]) + "_momentum.png")
 
 
